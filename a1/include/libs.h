@@ -11,4 +11,6 @@
 #include <unistd.h>
 #include <errno.h>
 
+#define MAXBUFFER 500
+
 #endif
