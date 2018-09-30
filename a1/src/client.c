@@ -5,11 +5,8 @@
 #include "libs.h"
 #include <arpa/inet.h>
 
-void error(char* msg)
-{
-    printf("%s\n", msg);
-    exit(1);
-}
+void error(char* msg);
+void sendFile(char* file, int socket);
 
 int main(int argc, char* argv[])
 {
@@ -38,16 +35,36 @@ int main(int argc, char* argv[])
     if (connect(s, (struct sockaddr*)&addr, sizeof(struct sockaddr_in)) < 0) 
         error("could not connect");
 
-    //Message details
-    char* msg = "Hello internet";
-
-    //TODO check errors
-    int sts = send(s, msg, strlen(msg), 0);
-    if (sts < 0)
-        error("could not send message");
-    printf("Sent %d bytes\n", sts);
+    sendFile("data/wonderland.txt", s);
 
     close(s);
     return 0;
+}
+
+void error(char* msg)
+{
+    printf("%s\n", msg);
+    exit(1);
+}
+
+void sendFile(char* file, int socket) 
+{
+    FILE* f;
+	if ((f = fopen(file, "r")) == NULL)
+		error("No File Found");
+    //Message details
+    char buffer[MAXBUFFER+1];
+    memset(buffer, 0, sizeof(buffer));
+    int bytesSent = 0;
+    while (fgets(buffer, MAXBUFFER, f))
+    {
+        int sts = send(socket, buffer, strlen(buffer), 0);
+        if (sts < 0)
+            error("could not send message");
+        else 
+            bytesSent += sts;
+    }
+    
+    printf("Sent %d bytes\n", bytesSent);
 }
 

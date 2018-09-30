@@ -20,9 +20,6 @@ int main(int argc, char* argv[])
     while(argv[1][++i] != '\0')
         port = port*10+argv[1][i]-'0';
     
-    int len;
-    char buffer[MAXBUFFER + 1];
-
     struct sockaddr_in dest, server;
     int s;
     socklen_t socketSize = sizeof(struct sockaddr_in);
@@ -44,9 +41,23 @@ int main(int argc, char* argv[])
 
     listen(s, 10);
     int connectionSocket;
+    char buffer[MAXBUFFER+1];
     while ((connectionSocket = accept(s, (struct sockaddr*)&dest, &socketSize)) > 0)
     {
-        printf("Recieved message from %s\n", inet_ntoa(dest.sin_addr));
+        //printf("Recieved message from %s\n", inet_ntoa(dest.sin_addr));
+        int len;
+        while ((len = recv(connectionSocket, buffer, MAXBUFFER, 0)) > 0) 
+        {
+            if (len < 0)
+            {
+                close(s);
+                error(strerror(errno));
+            }
+            buffer[len] = '\0';
+            printf("%s",buffer);
+        }
+        printf("\n");
+        close(connectionSocket);
     }
 
     close(s);
