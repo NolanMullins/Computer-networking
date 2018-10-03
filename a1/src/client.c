@@ -31,7 +31,6 @@ int main(int argc, char* argv[])
 
     int s = socket(AF_INET, SOCK_STREAM, 0);    
 
-    //TODO look at errors here
     if (connect(s, (struct sockaddr*)&addr, sizeof(struct sockaddr_in)) < 0) 
         error("could not connect");
 
@@ -58,6 +57,8 @@ void sendFile(char* file, int socket)
     int bytesSent = 0;
     while (fgets(buffer, MAXBUFFER, f))
     {
+        //need to check if server recieved correct amount of bytes
+        //will have to resend chunk if failed
         int sts = send(socket, buffer, strlen(buffer), 0);
         if (sts < 0)
             error("could not send message");
