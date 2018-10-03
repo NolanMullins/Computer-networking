@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
     if (connect(s, (struct sockaddr*)&addr, sizeof(struct sockaddr_in)) < 0) 
         error("could not connect");
 
-    sendFile("data/wonderland.txt", s);
+    sendFile("data/lessSmallText.txt", s);
 
     close(s);
     return 0;
@@ -57,13 +57,21 @@ void sendFile(char* file, int socket)
     int bytesSent = 0;
     while (fgets(buffer, MAXBUFFER, f))
     {
-        //need to check if server recieved correct amount of bytes
-        //will have to resend chunk if failed
-        int sts = send(socket, buffer, strlen(buffer), 0);
-        if (sts < 0)
-            error("could not send message");
-        else 
-            bytesSent += sts;
+        int sent = -1, sts = 0, attempts = -1;
+        while (sent != sts && ++attempts < 5)
+        {
+            //need to check if server recieved correct amount of bytes
+            //will have to resend chunk if failed
+            sts = send(socket, buffer, strlen(buffer), 0);
+            if (sts < 0)
+                error("could not send message");
+            recv(socket, &sent, sizeof(sent), 0);
+            if (sent !+ sts)
+                printf("%d == %d?\n",sent, sts);
+        }
+        if (attempts >= 5)
+            error("Something went really wrong and server just wont recieve this data\n");
+        bytesSent += sent;
     }
     
     printf("Sent %d bytes\n", bytesSent);
