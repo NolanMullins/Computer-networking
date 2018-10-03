@@ -68,7 +68,7 @@ void sendFile(char* file, int socket)
             if (sts < 0)
                 error("could not send message");
             recv(socket, &sent, sizeof(sent), 0);
-            if (sent !+ sts)
+            if (sent != sts)
                 printf("%d == %d?\n",sent, sts);
         }
         if (attempts >= 5)

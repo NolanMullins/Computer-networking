@@ -10,4 +10,7 @@ server: src/server.c
 clean:
 	rm client server
 
+run20x:
+	./run.sh localhost:8080 data/smallTest.txt 20
+
 
