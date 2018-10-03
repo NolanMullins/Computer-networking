@@ -12,6 +12,8 @@ int main(int argc, char* argv[])
 {
     if (argc < 2 || strchr(argv[1], ':')==NULL)
         error("IP:Port required");
+    if (argc < 3)
+        error("Need file");
 
     //Get IP and Port number
     int i=-1;
@@ -33,9 +35,9 @@ int main(int argc, char* argv[])
 
     //TODO look at errors here
     if (connect(s, (struct sockaddr*)&addr, sizeof(struct sockaddr_in)) < 0) 
-        error("could not connect");
+        error("Could not connect");
 
-    sendFile("data/wonderland.txt", s);
+    sendFile(argv[2], s);
 
     close(s);
     return 0;
