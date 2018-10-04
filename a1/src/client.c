@@ -79,7 +79,6 @@ void sendFile(char* file, int socket)
         int sent = -1, sts = 0, attempts = -1;
         while (sent != sts && ++attempts < 5)
         {
-            printf("strlen: %ld\n", strlen(buffer));
             sts = send(socket, buffer, strlen(buffer), 0);
             if (sts < 0)
                 sent = 0;
@@ -90,7 +89,10 @@ void sendFile(char* file, int socket)
                 printf("%d == %d?\n",sent, sts);*/
         }
         if (attempts >= 5)
+        {
+            close(socket);
             error("Could not send data to server, aborting\n");
+        }
         bytesSent += sent;
     }
     
