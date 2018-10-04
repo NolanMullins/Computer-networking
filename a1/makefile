@@ -1,11 +1,13 @@
 FLAGS = -Iinclude
+CLIENT = src/client.o
+SERVER = src/server.o src/networkHelpers.o
 all: client server
 
-client: src/client.o
-	gcc src/client.o $(FLAGS) -o client
+client: $(CLIENT)
+	gcc $(CLIENT) $(FLAGS) -o client
 
-server: src/server.o src/networkHelpers.o
-	gcc src/server.o src/networkHelpers.o $(FLAGS) -o server
+server: $(SERVER)
+	gcc $(SERVER) $(FLAGS) -o server
 
 clean:
 	rm client server src/*.o

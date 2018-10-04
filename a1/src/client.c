@@ -5,7 +5,7 @@
 
 #include "libs.h"
 
-#define timing 1
+#define timing 0
 #define debug 1
 
 void error(char* msg);

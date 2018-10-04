@@ -4,6 +4,15 @@
  * Student #: 0939720  *
 /***********************/
 
+How to use:
+
+1) ./server <port>
+2) ./client <ip:port> <file> <msg size>
+
+Script:
+
+./run.sh <ip:port> <file> <# of times to run>
+
 /*****************************************/
  Client at home -> linux.socs.uoguelph.ca
 /*****************************************/

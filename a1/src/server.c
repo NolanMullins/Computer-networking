@@ -6,7 +6,7 @@
 #include "libs.h"
 #include "networkStuff.h"
 
-#define debug 1
+#define debug 0 
 
 void error(const char* msg)
 {
@@ -74,7 +74,8 @@ int main(int argc, char* argv[])
     char buffer[MAXBUFFER+1];
     while ((connectionSocket = accept(s, (struct sockaddr*)&dest, &socketSize)) > 0)
     {
-        //printf("Recieved message from %s\n", inet_ntoa(dest.sin_addr));
+        if (debug)
+            printf("Recieved message from %s\n", inet_ntoa(dest.sin_addr));
         int len;
         while ((len = recv(connectionSocket, buffer, MAXBUFFER, 0)) > 0) 
         {
