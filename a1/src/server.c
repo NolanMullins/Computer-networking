@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
                 error(strerror(errno));
             }
             buffer[len] = '\0';
-            send(connectionSocket, &len, sizeof(len), 0);
+            //send(connectionSocket, &len, sizeof(len), 0);
             printf("%s",buffer);
         }
         printf("\n");

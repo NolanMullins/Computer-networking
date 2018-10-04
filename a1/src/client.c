@@ -8,12 +8,16 @@
 void error(char* msg);
 void sendFile(char* file, int socket);
 
+int bufMAX = MAXBUFFER;
+
 int main(int argc, char* argv[])
 {
     if (argc < 2 || strchr(argv[1], ':')==NULL)
         error("IP:Port required");
     if (argc < 3)
         error("Need file");
+    if (argc > 3)
+        bufMAX = strtol(argv[3], NULL, 10);
 
     //Get IP and Port number
     int i=-1;
@@ -48,28 +52,42 @@ void error(char* msg)
     exit(1);
 }
 
+int readBuffer(char* str, int buffer, FILE* f) 
+{
+    if (f == NULL)
+        return -1;
+    char c;
+    int len = 0;
+    while (len < buffer && (c = fgetc(f)) != EOF) 
+        str[len++] = c;
+    str[len] = '\0';
+    return len;
+}
+
 void sendFile(char* file, int socket) 
 {
     FILE* f;
 	if ((f = fopen(file, "r")) == NULL)
 		error("No File Found");
     //Message details
-    char buffer[MAXBUFFER+1];
+    char buffer[bufMAX+1];
     memset(buffer, 0, sizeof(buffer));
     int bytesSent = 0;
-    while (fgets(buffer, MAXBUFFER, f))
+    //while (fgets(buffer, MAXBUFFER, f))
+    while (readBuffer(buffer, bufMAX, f) > 0)
     {
         int sent = -1, sts = 0, attempts = -1;
         while (sent != sts && ++attempts < 5)
         {
-            //need to check if server recieved correct amount of bytes
-            //will have to resend chunk if failed
+            printf("strlen: %ld\n", strlen(buffer));
             sts = send(socket, buffer, strlen(buffer), 0);
             if (sts < 0)
-                error("could not send message");
-            recv(socket, &sent, sizeof(sent), 0);
+                sent = 0;
+            else
+                sent = sts;
+            /*recv(socket, &sent, sizeof(sent), 0);
             if (sent != sts)
-                printf("%d == %d?\n",sent, sts);
+                printf("%d == %d?\n",sent, sts);*/
         }
         if (attempts >= 5)
             error("Something went really wrong and server just wont recieve this data\n");
