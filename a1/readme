@@ -41,41 +41,46 @@ transfer min: 0.0187s
 transfer max: 0.0399s
 
 Rate avg: 5.432 MB/s
-Rate min: 9.059 MB/s
-Rate max: 4.255 MB/s
+Rate max: 9.059 MB/s
+Rate min: 4.255 MB/s
 
 /**************************************************/
  Client at school (wifi) -> linux.socs.uoguelph.ca
 /**************************************************/
 
-Ping avg:
-Ping min:
-Ping max:
+Ping avg: 20.105ms
+Ping min: 1.697ms
+Ping max: 132.911ms
 
-trace route:
+  1     1 ms     1 ms     2 ms  10.11.16.1
+  2     2 ms     2 ms     2 ms  da-cj.net.uoguelph.ca [131.104.134.5]
+  3     5 ms     1 ms     1 ms  spider.cis.uoguelph.ca [131.104.48.74]
 
-transfer avg:
-transfer min:
-transfer max:
+transfer avg: 0.0176s
+transfer min: 0.0095s
+transfer max: 0.0272s
 
-Rate avg:
-Rate min:
-Rate max:
+Rate avg: 9.669 MB/s
+Rate max: 17.847 MB/s 
+Rate min: 6.235 MB/s
 
 /***************************************************/
  Client at school (wired) -> linux.socs.uoguelph.ca
 /***************************************************/
 
-Ping avg: 
-Ping min: 
-Ping max: 
+Ping avg: 6.522ms
+Ping min: 1.841ms
+Ping max: 20.063ms
 
-trace route:
+  1     1 ms     1 ms     1 ms  10.2.146.1
+  2     2 ms     1 ms     2 ms  ca-dj.net.uoguelph.ca [131.104.133.6]
+  3     3 ms     1 ms     1 ms  da-ca.net.uoguelph.ca [131.104.134.1]
+  4     1 ms     1 ms     1 ms  percy.socs.uoguelph.ca [131.104.48.74]
 
-transfer avg:
-transfer min:
-transfer max:
+transfer avg: 0.0101s
+transfer min: 0.0086s
+transfer max: 0.01285s
 
-Rate avg:
-Rate min:
-Rate max:
+Rate avg: 16.806 MB/s
+Rate max: 19.723 MB/s
+Rate min: 13.218 MB/s
