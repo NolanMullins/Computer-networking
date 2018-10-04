@@ -90,7 +90,7 @@ void sendFile(char* file, int socket)
                 printf("%d == %d?\n",sent, sts);*/
         }
         if (attempts >= 5)
-            error("Something went really wrong and server just wont recieve this data\n");
+            error("Could not send data to server, aborting\n");
         bytesSent += sent;
     }
     
