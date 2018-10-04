@@ -11,7 +11,10 @@ clean:
 	rm client server src/*.o
 
 run20x:
-	./run.sh localhost:8080 data/smallTest.txt 20
+	./run.sh localhost:8080 data/wonderland.txt 20
+
+runSever20x:
+	./run.sh 131.104.48.74:12059 data/wonderland.txt 20
 
 %.o : %.c
 	gcc -c $*.c $(FLAGS) -o $*.o

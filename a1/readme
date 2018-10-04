@@ -8,19 +8,41 @@
  Client at home -> linux.socs.uoguelph.ca
 /*****************************************/
 
-Ping avg:
-Ping min:
-Ping max:
+Ping avg: 13ms
+Ping min: 7ms
+Ping max: 23ms
 
-trace route:
+  1     1 ms     1 ms     1 ms  hitronhub.home [192.168.0.1]
+  2    56 ms    11 ms    10 ms  99.225.176.1
+  3     9 ms    13 ms    13 ms  69.63.243.153
+  4    11 ms    11 ms    10 ms  9012-cgw01.wlfdle.rmgt.net.rogers.com [64.71.240.1]
+  5    12 ms    14 ms    13 ms  209.148.230.46
+  6    16 ms    13 ms    14 ms  24.156.146.190
+  7    11 ms    15 ms    14 ms  24.156.146.217
+  8     *        *        *     Request timed out.
+  9     *        *        *     Request timed out.
+ 10     *        *        *     Request timed out.
+ 11     *        *        *     Request timed out.
+ 12     *        *        *     Request timed out.
+ 13     *        *        *     Request timed out.
+ 14     *        *        *     Request timed out.
+ 15     *        *        *     Request timed out.
+ 16     *        *        *     Request timed out.
+ 17     *        *        *     Request timed out.
+ 18     *        *        *     Request timed out.
+ 19     *        *        *     Request timed out.
+ 20     *        *        *     Request timed out.
+ 21     *        *        *     Request timed out.
+ 22     *        *        *     Request timed out.
+ 23    16 ms    16 ms    12 ms  spider.cis.uoguelph.ca [131.104.48.74]
 
-transfer avg:
-transfer min:
-transfer max:
+transfer avg: 0.0313s
+transfer min: 0.0187s
+transfer max: 0.0399s
 
-Rate avg:
-Rate min:
-Rate max:
+Rate avg: 5.432 MB/s
+Rate min: 9.059 MB/s
+Rate max: 4.255 MB/s
 
 /**************************************************/
  Client at school (wifi) -> linux.socs.uoguelph.ca
@@ -44,9 +66,9 @@ Rate max:
  Client at school (wired) -> linux.socs.uoguelph.ca
 /***************************************************/
 
-Ping avg:
-Ping min:
-Ping max:
+Ping avg: 
+Ping min: 
+Ping max: 
 
 trace route:
 
