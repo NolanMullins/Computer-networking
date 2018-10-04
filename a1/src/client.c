@@ -1,9 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "libs.h"
-#include <arpa/inet.h>
+
+#define timing 1
+#define debug 1
 
 void error(char* msg);
 void sendFile(char* file, int socket);
@@ -29,6 +32,12 @@ int main(int argc, char* argv[])
     while(argv[1][++i] != '\0')
         port = port*10+argv[1][i]-'0';
 
+    //start timing 
+    struct timespec start, finish;
+	double elapsed;
+
+	clock_gettime(CLOCK_MONOTONIC, &start);
+
     struct sockaddr_in addr;
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
@@ -41,6 +50,14 @@ int main(int argc, char* argv[])
         error("Could not connect");
 
     sendFile(argv[2], s);
+
+    clock_gettime(CLOCK_MONOTONIC, &finish);
+
+    elapsed = (finish.tv_sec - start.tv_sec);
+    elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
+
+    if (timing)
+        printf("time taken: %lf\n", elapsed);
 
     close(s);
     return 0;
@@ -95,7 +112,8 @@ void sendFile(char* file, int socket)
         }
         bytesSent += sent;
     }
-    
-    printf("Sent %d bytes\n", bytesSent);
+
+    if (debug) 
+        printf("Sent %d bytes\n", bytesSent);
 }
 

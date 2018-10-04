@@ -6,6 +6,8 @@
 #include "libs.h"
 #include "networkStuff.h"
 
+#define debug 1
+
 void error(const char* msg)
 {
     printf("%s\n", msg);
@@ -45,25 +47,27 @@ int main(int argc, char* argv[])
     struct ifaddrs *ifaddr, *ifa;
     char host[NI_MAXHOST];
 
-    if (getifaddrs(&ifaddr) == -1) {
-        perror("getifaddrs");
-        exit(EXIT_FAILURE);
-    }
+    if (debug)
+        if (getifaddrs(&ifaddr) == -1) {
+            perror("getifaddrs");
+            exit(EXIT_FAILURE);
+        }
 
     int n;
-    for (ifa = ifaddr, n = 0; ifa != NULL; ifa = ifa->ifa_next, n++) {
-        printf("loop\n");
-        if (ifa->ifa_addr == NULL)
-            continue;
+    if (debug)
+        for (ifa = ifaddr, n = 0; ifa != NULL; ifa = ifa->ifa_next, n++) {
+            printf("loop\n");
+            if (ifa->ifa_addr == NULL)
+                continue;
 
-        int family = ifa->ifa_addr->sa_family;
-        if (family == AF_INET || family == AF_INET6) {
-            int sts = getnameinfo(ifa->ifa_addr, (family == AF_INET) ? sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6), host, NI_MAXHOST,NULL, 0, NI_NUMERICHOST);
-            if (sts != 0) 
-                error(gai_strerror(sts));
-            printf("%s:\t%s\n",ifa->ifa_name, host);
+            int family = ifa->ifa_addr->sa_family;
+            if (family == AF_INET || family == AF_INET6) {
+                int sts = getnameinfo(ifa->ifa_addr, (family == AF_INET) ? sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6), host, NI_MAXHOST,NULL, 0, NI_NUMERICHOST);
+                if (sts != 0) 
+                    error(gai_strerror(sts));
+                printf("%s:\t%s\n",ifa->ifa_name, host);
+            }
         }
-    }
 
     listen(s, 10);
     int connectionSocket;

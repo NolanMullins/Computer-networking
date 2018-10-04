@@ -4,3 +4,56 @@
  * Student #: 0939720  *
 /***********************/
 
+/*****************************************/
+ Client at home -> linux.socs.uoguelph.ca
+/*****************************************/
+
+Ping avg:
+Ping min:
+Ping max:
+
+trace route:
+
+transfer avg:
+transfer min:
+transfer max:
+
+Rate avg:
+Rate min:
+Rate max:
+
+/**************************************************/
+ Client at school (wifi) -> linux.socs.uoguelph.ca
+/**************************************************/
+
+Ping avg:
+Ping min:
+Ping max:
+
+trace route:
+
+transfer avg:
+transfer min:
+transfer max:
+
+Rate avg:
+Rate min:
+Rate max:
+
+/***************************************************/
+ Client at school (wired) -> linux.socs.uoguelph.ca
+/***************************************************/
+
+Ping avg:
+Ping min:
+Ping max:
+
+trace route:
+
+transfer avg:
+transfer min:
+transfer max:
+
+Rate avg:
+Rate min:
+Rate max:
