@@ -3,11 +3,18 @@
 #include <string.h>
 #include <ifaddrs.h>
 #include <signal.h>
+#include <pthread.h>
 
 #include "libs.h"
 #include "networkStuff.h"
 
-#define debug 0 
+#define debug 1
+
+typedef struct 
+{
+    int socket;
+    char* addr;
+} ConnectionData;
 
 void error(const char* msg)
 {
@@ -17,9 +24,8 @@ void error(const char* msg)
 
 int s;
 
-static void rageHandler(int signum) 
+void rageHandler(int signum) 
 {
-    printf("Hello cntrl-c\n");
     close(s);
 }
 
@@ -44,12 +50,8 @@ int main(int argc, char* argv[])
 
     s = socket(AF_INET, SOCK_STREAM, 0);
 
-    struct sigaction sig;
-    sig.sa_flags = SA_SIGINFO;
-    sigemptyset(&sig.sa_mask);
-    sig.sa_sigaction = &rageHandler;
-    if (sigaction(SIGSEGV, &sig, NULL) == -1)
-        error("sigaction");
+    //Handle outside termination of program
+    signal(SIGINT, rageHandler);
 
     if (bind(s, (struct sockaddr*)&server, sizeof(struct sockaddr)) != 0)
     {
@@ -63,14 +65,14 @@ int main(int argc, char* argv[])
     struct ifaddrs *ifaddr, *ifa;
     char host[NI_MAXHOST];
 
-    if (debug)
+    if (debug > 0)
         if (getifaddrs(&ifaddr) == -1) {
             perror("getifaddrs");
             exit(EXIT_FAILURE);
         }
 
     int n;
-    if (debug)
+    if (debug > 1)
         for (ifa = ifaddr, n = 0; ifa != NULL; ifa = ifa->ifa_next, n++) {
             printf("loop\n");
             if (ifa->ifa_addr == NULL)
@@ -87,27 +89,45 @@ int main(int argc, char* argv[])
 
     listen(s, 10);
     int connectionSocket;
-    char buffer[MAXBUFFER+1];
     while ((connectionSocket = accept(s, (struct sockaddr*)&dest, &socketSize)) > 0)
     {
-        if (debug)
-            printf("Recieved message from %s\n", inet_ntoa(dest.sin_addr));
-        int len;
-        while ((len = recv(connectionSocket, buffer, MAXBUFFER, 0)) > 0) 
-        {
-            if (len < 0)
-            {
-                close(s);
-                error(strerror(errno));
-            }
-            buffer[len] = '\0';
-            //send(connectionSocket, &len, sizeof(len), 0);
-            printf("%s",buffer);
-        }
-        printf("\n");
-        close(connectionSocket);
+        ConnectionData* data = malloc(sizeof(connectionData));
+        data->socket = connectionSocket;
+        unsigned char* addrBuf = malloc(sizeof(char)*INET6_ADDRSTRLEN+1);
+        inet_ntop(dest.sin_family, dest.sin_addr, addrBuf, INET6_ADDRSTRLEN);
+        pthread_t thread;
+        if (pthread_create(&thread, NULL, threadAccept, &data))
+		{
+			free(data);
+            close(s);
+            error("Error creating thread");
+		}
     }
 
     close(s);
     return 0;
+}
+
+void* threadAccept(void* args) 
+{
+    char buffer[MAXBUFFER+1];
+    int connectionSocket = 0;
+
+    if (debug > 0)
+        printf("Recieved message from %s\n", );
+    int len;
+    while ((len = recv(connectionSocket, buffer, MAXBUFFER, 0)) > 0) 
+    {
+        if (len < 0)
+        {
+            close(s);
+            error(strerror(errno));
+        }
+        buffer[len] = '\0';
+        //send(connectionSocket, &len, sizeof(len), 0);
+        printf("%s",buffer);
+    }
+    printf("\n");
+    free(args);
+    close(connectionSocket);
 }

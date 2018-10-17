@@ -13,4 +13,11 @@
 
 #define MAXBUFFER 1024
 
+typedef struct
+{
+    int fileSize;
+    int chunkSize;
+    char fileName[21];
+} fileInfo;
+
 #endif

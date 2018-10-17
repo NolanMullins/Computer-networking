@@ -6,13 +6,6 @@
 
 #define debug 1
 
-typedef struct
-{
-    int fileSize;
-    int chunkSize;
-    char fileName[21];
-} fileInfo;
-
 void error(const char* msg);
 void sendFile(char* file, int socket);
 

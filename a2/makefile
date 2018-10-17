@@ -1,4 +1,4 @@
-FLAGS = -Iinclude 
+FLAGS = -Iinclude -pthread
 CLIENT = src/client.o
 SERVER = src/server.o src/networkHelpers.o 
 all: client server
