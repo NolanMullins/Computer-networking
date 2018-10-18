@@ -5,6 +5,7 @@
 #include <signal.h>
 #include <pthread.h>
 
+#include "list.h"
 #include "libs.h"
 #include "networkStuff.h"
 
@@ -16,14 +17,17 @@ typedef struct
     char* addr;
 } ConnectionData;
 
+void* threadAccept(void* args);
+
+//prints a message and closes shop
 void error(const char* msg)
 {
     printf("%s\n", msg);
     exit(1);
 }
 
+//s is the server socket, rage handler is setup to handle cntrl-c
 int s;
-
 void rageHandler(int signum) 
 {
     close(s);
@@ -71,6 +75,8 @@ int main(int argc, char* argv[])
             exit(EXIT_FAILURE);
         }
 
+
+    //Prints out the servers IP, useful for debugging
     int n;
     if (debug > 1)
         for (ifa = ifaddr, n = 0; ifa != NULL; ifa = ifa->ifa_next, n++) {
@@ -88,13 +94,16 @@ int main(int argc, char* argv[])
         }
 
     listen(s, 10);
+
     int connectionSocket;
     while ((connectionSocket = accept(s, (struct sockaddr*)&dest, &socketSize)) > 0)
     {
-        ConnectionData* data = malloc(sizeof(connectionData));
+        printf("connectionSocket %d\n", connectionSocket);
+        //pass connection data off to alt thread
+        ConnectionData* data = malloc(sizeof(ConnectionData));
         data->socket = connectionSocket;
         unsigned char* addrBuf = malloc(sizeof(char)*INET6_ADDRSTRLEN+1);
-        inet_ntop(dest.sin_family, dest.sin_addr, addrBuf, INET6_ADDRSTRLEN);
+        //inet_ntop(dest.sin_family, dest.sin_addr, addrBuf, INET6_ADDRSTRLEN);
         pthread_t thread;
         if (pthread_create(&thread, NULL, threadAccept, &data))
 		{
@@ -104,6 +113,8 @@ int main(int argc, char* argv[])
 		}
     }
 
+    printf("connectionSocket %d\n", connectionSocket);
+
     close(s);
     return 0;
 }
@@ -111,10 +122,10 @@ int main(int argc, char* argv[])
 void* threadAccept(void* args) 
 {
     char buffer[MAXBUFFER+1];
-    int connectionSocket = 0;
+    int connectionSocket = (*(ConnectionData**)args)->socket;
 
     if (debug > 0)
-        printf("Recieved message from %s\n", );
+        printf("Recieved message from todo\n");
     int len;
     while ((len = recv(connectionSocket, buffer, MAXBUFFER, 0)) > 0) 
     {
@@ -128,6 +139,7 @@ void* threadAccept(void* args)
         printf("%s",buffer);
     }
     printf("\n");
-    free(args);
+    free(*(ConnectionData**)args);
     close(connectionSocket);
+    printf("Closed socket %d\n", connectionSocket);
 }

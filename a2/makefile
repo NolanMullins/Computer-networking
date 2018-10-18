@@ -1,6 +1,6 @@
 FLAGS = -Iinclude -pthread
 CLIENT = src/client.o
-SERVER = src/server.o src/networkHelpers.o 
+SERVER = src/server.o src/networkHelpers.o src/list.o
 all: client server
 
 client: $(CLIENT)
