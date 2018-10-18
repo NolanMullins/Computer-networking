@@ -10,12 +10,7 @@
 #include "networkStuff.h"
 
 #define debug 1
-
-typedef struct 
-{
-    int socket;
-    char* addr;
-} ConnectionData;
+#define printFile 0
 
 void* threadAccept(void* args);
 
@@ -95,26 +90,20 @@ int main(int argc, char* argv[])
 
     listen(s, 10);
 
-    int connectionSocket;
+    List* threads = init();
+    long connectionSocket;
     while ((connectionSocket = accept(s, (struct sockaddr*)&dest, &socketSize)) > 0)
     {
-        printf("connectionSocket %d\n", connectionSocket);
-        //pass connection data off to alt thread
-        ConnectionData* data = malloc(sizeof(ConnectionData));
-        data->socket = connectionSocket;
-        unsigned char* addrBuf = malloc(sizeof(char)*INET6_ADDRSTRLEN+1);
-        //inet_ntop(dest.sin_family, dest.sin_addr, addrBuf, INET6_ADDRSTRLEN);
+        if (debug > 0)
+            printf("Recieved message from %s\n", inet_ntoa(dest.sin_addr));
         pthread_t thread;
-        if (pthread_create(&thread, NULL, threadAccept, &data))
+        if (pthread_create(&thread, NULL, threadAccept, (void*)connectionSocket))
 		{
-			free(data);
             close(s);
             error("Error creating thread");
 		}
     }
-
-    printf("connectionSocket %d\n", connectionSocket);
-
+    printf("closing shop\n");
     close(s);
     return 0;
 }
@@ -122,10 +111,8 @@ int main(int argc, char* argv[])
 void* threadAccept(void* args) 
 {
     char buffer[MAXBUFFER+1];
-    int connectionSocket = (*(ConnectionData**)args)->socket;
-
-    if (debug > 0)
-        printf("Recieved message from todo\n");
+    long connectionSocket = (long)args;
+    
     int len;
     while ((len = recv(connectionSocket, buffer, MAXBUFFER, 0)) > 0) 
     {
@@ -136,10 +123,9 @@ void* threadAccept(void* args)
         }
         buffer[len] = '\0';
         //send(connectionSocket, &len, sizeof(len), 0);
-        printf("%s",buffer);
+        if (printFile)
+            printf("%s",buffer);
     }
     printf("\n");
-    free(*(ConnectionData**)args);
     close(connectionSocket);
-    printf("Closed socket %d\n", connectionSocket);
 }
