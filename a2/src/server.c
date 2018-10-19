@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
             error("Error creating thread");
 		}
     }
-    printf("closing shop\n");
+    printf("\nclosing shop\n");
     close(s);
     return 0;
 }
@@ -112,7 +112,20 @@ void* threadAccept(void* args)
 {
     char buffer[MAXBUFFER+1];
     long connectionSocket = (long)args;
-    
+
+    //TODO recv file info from client
+    char* givenName = "tmp";
+
+    int ending = 0;
+    char fname[128];
+    sprintf(fname, "%s%s", "output/", givenName);
+    //Append number to end of file if needed
+    if (access(fname, F_OK) != -1)
+        while (access(fname, F_OK) != -1)
+            sprintf(fname, "%s%s-%d", "output/", givenName, ++ending);
+
+    FILE* output = fopen(fname, "w");
+
     int len;
     while ((len = recv(connectionSocket, buffer, MAXBUFFER, 0)) > 0) 
     {
@@ -122,10 +135,8 @@ void* threadAccept(void* args)
             error(strerror(errno));
         }
         buffer[len] = '\0';
-        //send(connectionSocket, &len, sizeof(len), 0);
-        if (printFile)
-            printf("%s",buffer);
+        fprintf(output, "%s", buffer);
     }
-    printf("\n");
+    fclose(output);
     close(connectionSocket);
 }

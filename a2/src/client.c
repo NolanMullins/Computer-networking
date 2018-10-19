@@ -15,10 +15,11 @@ int main(int argc, char* argv[])
 {
     if (argc < 2 || strchr(argv[1], ':')==NULL)
         error("IP:Port required");
-    if (argc < 3)
-        error("Need file");
+    if (argc < 3 || access(argv[2], F_OK) == -1)
+        error("No file / file not found");
     if (argc > 3)
         bufMAX = strtol(argv[3], NULL, 10);
+    
 
     //Get IP and Port number
     int i=-1;
