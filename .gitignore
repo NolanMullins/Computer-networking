@@ -1,0 +1,4 @@
+#Nolans ignore file since ryan keeps commiting obj files :(
+
+*.o
+
