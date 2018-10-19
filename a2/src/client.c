@@ -4,7 +4,7 @@
 
 #include "libs.h"
 
-#define debug 1
+#define debug 0
 
 void error(const char* msg);
 void sendFile(char* file, int socket);
@@ -19,7 +19,6 @@ int main(int argc, char* argv[])
         error("No file / file not found");
     if (argc > 3)
         bufMAX = strtol(argv[3], NULL, 10);
-
 
     //Get IP and Port number
     int i=-1;
@@ -82,7 +81,9 @@ void sendFile(char* file, int socket)
 		error("No File Found");
 
     FileInfo fInfo;
-    fInfo.fileSize = 0;
+    fseek(f, 0,  SEEK_END);
+    fInfo.fileSize = (unsigned long)ftell(f);
+    fseek(f, 0, SEEK_SET);
     fInfo.chunkSize = bufMAX;
     int nameLen = strlen(file);
     int index;
@@ -95,7 +96,7 @@ void sendFile(char* file, int socket)
     int a;
     for (a = index; a < nameLen; a++)
         fInfo.fileName[a-index] = file[a];
-    fInfo.fileName[a] = '\0';
+    fInfo.fileName[a-index] = '\0';
 
     //Send over file information
     int i = -1;
@@ -132,7 +133,8 @@ void sendFile(char* file, int socket)
         }
         bytesSent += sent;
 
-        sleep(1);
+        if (debug)
+            sleep(1);
     }
 
     if (debug)

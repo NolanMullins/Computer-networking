@@ -9,8 +9,8 @@
 #include "libs.h"
 #include "networkStuff.h"
 
-#define debug 1
-#define outputFile 0
+#define debug 0
+#define outputFile 1
 
 void* threadAccept(void* args);
 void *UIThread(void *args);
@@ -141,7 +141,7 @@ int main(int argc, char* argv[])
 
       if (rc < 0)
       {
-         perror("select() failed");
+         perror("\nselect() failed");
          break;
       }
 
@@ -178,8 +178,6 @@ int main(int argc, char* argv[])
          }
          continue;
       }
-
-      printf("%i\n", rc);
 
       if ((connectionSocket = accept(s, (struct sockaddr*)&dest, &socketSize)) > 0)
       {
@@ -308,7 +306,7 @@ void* threadAccept(void* args)
         currentChunk++;
 
         pthread_mutex_lock(&mutex);
-        threadInfo->thread->percent = 100 * ( ( ((double)currentChunk) * ((double)fInfo.chunkSize) )/((double)fInfo.fileSize) );
+        threadInfo->thread->percent = 100 * ( ( ((double)currentChunk) * ((double)fInfo.chunkSize) )/((unsigned long)fInfo.fileSize) );
         // threadInfo->thread->percent = fInfo.fileSize;
         pthread_mutex_unlock(&mutex);
 
@@ -319,6 +317,5 @@ void* threadAccept(void* args)
     if (outputFile)
         fclose(output);
 
-    printf("done\n");
     close(connectionSocket);
 }
