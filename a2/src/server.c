@@ -113,20 +113,23 @@ void* threadAccept(void* args)
     char buffer[MAXBUFFER+1];
     long connectionSocket = (long)args;
 
-    //TODO recv file info from client
-    char* givenName = "tmp";
-
+    FileInfo fInfo;
+    int len = recv(connectionSocket, &fInfo, sizeof(FileInfo), 0);
     int ending = 0;
     char fname[128];
-    sprintf(fname, "%s%s", "output/", givenName);
+    sprintf(fname, "%s%s", "output/", fInfo.fileName);
     //Append number to end of file if needed
     if (access(fname, F_OK) != -1)
         while (access(fname, F_OK) != -1)
-            sprintf(fname, "%s%s-%d", "output/", givenName, ++ending);
+            sprintf(fname, "%s%s-%d", "output/", fInfo.fileName, ++ending);
 
     FILE* output = fopen(fname, "w");
+    if (output == NULL)
+    {
+        close(connectionSocket);
+        error("Could not create file");
+    }
 
-    int len;
     while ((len = recv(connectionSocket, buffer, MAXBUFFER, 0)) > 0) 
     {
         if (len < 0)

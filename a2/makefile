@@ -12,6 +12,9 @@ server: $(SERVER)
 clean:
 	rm client server src/*.o
 
+run: 
+	./client localhost:8080 data/smallTest.txt
+
 run20x:
 	./run.sh localhost:8080 data/wonderlandBig.txt 20
 

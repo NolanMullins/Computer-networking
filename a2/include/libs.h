@@ -17,7 +17,7 @@ typedef struct
 {
     int fileSize;
     int chunkSize;
-    char fileName[21];
-} fileInfo;
+    char fileName[64];
+} FileInfo;
 
 #endif

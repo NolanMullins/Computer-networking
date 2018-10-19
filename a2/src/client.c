@@ -80,6 +80,32 @@ void sendFile(char* file, int socket)
     FILE* f;
 	if ((f = fopen(file, "r")) == NULL)
 		error("No File Found");
+
+    FileInfo fInfo;
+    fInfo.fileSize = 0;
+    fInfo.chunkSize = bufMAX;
+    int nameLen = strlen(file);
+    int index;
+    //Check if file is in sub directory and parse out name
+    for (index = nameLen-1; index >= 0; index--)
+        if (file[index] == '/' || file[index] == '\\')
+            break;
+    if (index > 0)
+        index++;
+    int a;
+    for (a = index; a < nameLen; a++)
+        fInfo.fileName[a-index] = file[a];
+    fInfo.fileName[a] = '\0';
+
+    //Send over file information
+    int i = -1;
+    while (send(socket, &fInfo, sizeof(FileInfo), 0) < 0 && ++i < 5);
+    if (i == 5)
+    {
+        close(socket);
+        error("Could not send file information");
+    }
+        
     //Message details
     char buffer[bufMAX+1];
     memset(buffer, 0, sizeof(buffer));
