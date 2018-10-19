@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
         error("No file / file not found");
     if (argc > 3)
         bufMAX = strtol(argv[3], NULL, 10);
-    
+
 
     //Get IP and Port number
     int i=-1;
@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
     ip[i] = '\0';
     int j = 0;
     while(argv[1][++i] != '\0')
-        port[j++] = argv[1][i]; 
+        port[j++] = argv[1][i];
     port[j] = '\0';
 
     struct addrinfo hints, *addrInfo, *info;
@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
         break;
     }
 
-    if (connect(s, addrInfo->ai_addr, sizeof(struct sockaddr_in)) < 0) 
+    if (connect(s, addrInfo->ai_addr, sizeof(struct sockaddr_in)) < 0)
         error("Could not connect");
 
     sendFile(argv[2], s);
@@ -63,19 +63,19 @@ void error(const char* msg)
     exit(1);
 }
 
-int readBuffer(char* str, int buffer, FILE* f) 
+int readBuffer(char* str, int buffer, FILE* f)
 {
     if (f == NULL)
         return -1;
     char c;
     int len = 0;
-    while (len < buffer && (c = fgetc(f)) != EOF) 
+    while (len < buffer && (c = fgetc(f)) != EOF)
         str[len++] = c;
     str[len] = '\0';
     return len;
 }
 
-void sendFile(char* file, int socket) 
+void sendFile(char* file, int socket)
 {
     FILE* f;
 	if ((f = fopen(file, "r")) == NULL)
@@ -105,7 +105,7 @@ void sendFile(char* file, int socket)
         close(socket);
         error("Could not send file information");
     }
-        
+
     //Message details
     char buffer[bufMAX+1];
     memset(buffer, 0, sizeof(buffer));
@@ -131,9 +131,10 @@ void sendFile(char* file, int socket)
             error("Could not send data to server, aborting\n");
         }
         bytesSent += sent;
+
+        sleep(1);
     }
 
-    if (debug) 
+    if (debug)
         printf("Sent %d bytes\n", bytesSent);
 }
-
