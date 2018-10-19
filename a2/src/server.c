@@ -10,7 +10,7 @@
 #include "networkStuff.h"
 
 #define debug 1
-#define printFile 0
+#define outputFile 0
 
 void* threadAccept(void* args);
 
@@ -123,11 +123,15 @@ void* threadAccept(void* args)
         while (access(fname, F_OK) != -1)
             sprintf(fname, "%s%s-%d", "output/", fInfo.fileName, ++ending);
 
-    FILE* output = fopen(fname, "w");
-    if (output == NULL)
+    FILE* output;
+    if (outputFile)
     {
-        close(connectionSocket);
-        error("Could not create file");
+        output = fopen(fname, "w");
+        if (output == NULL)
+        {
+            close(connectionSocket);
+            error("Could not create file");
+        }
     }
 
     while ((len = recv(connectionSocket, buffer, MAXBUFFER, 0)) > 0) 
@@ -138,8 +142,10 @@ void* threadAccept(void* args)
             error(strerror(errno));
         }
         buffer[len] = '\0';
-        fprintf(output, "%s", buffer);
+        if (outputFile)
+            fprintf(output, "%s", buffer);
     }
-    fclose(output);
+    if (outputFile)
+        fclose(output);
     close(connectionSocket);
 }
