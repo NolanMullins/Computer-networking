@@ -12,11 +12,11 @@
 #define debug 0
 #define outputFile 1
 
-void* threadAccept(void* args);
+void *threadAccept(void *args);
 void *UIThread(void *args);
 
 //prints a message and closes shop
-void error(const char* msg)
+void error(const char *msg)
 {
     printf("%s\n", msg);
     exit(1);
@@ -31,44 +31,45 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 typedef struct thread
 {
-  pthread_t tid;
-  int percent;
+    pthread_t tid;
+    int percent;
 
-  char *filename;
-  char *ip;
-}Thread;
+    char *filename;
+    char *ip;
+} Thread;
 
-typedef struct threadInfo{
-  long connectionSocket;
-  Thread *thread;
-}ThreadInfo;
+typedef struct threadInfo
+{
+    long connectionSocket;
+    Thread *thread;
+} ThreadInfo;
 
 void destroy(void *data)
 {
-  Thread * t = (Thread*)data;
+    Thread *t = (Thread *)data;
 
-  if(t->filename)
-    free(t->filename);
-  if(t->ip)
-    free(t->ip);
-  free(t);
+    if (t->filename)
+        free(t->filename);
+    if (t->ip)
+        free(t->ip);
+    free(t);
 }
 
 void rageHandler(int signum)
 {
-  list = listClear(list, destroy);
+    list = listClear(list, destroy);
     close(s);
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     if (argc < 2)
         error("Port required");
 
     //Port number
-    int i=-1, port = 0;
-    while(argv[1][++i] != '\0')
-        port = port*10+argv[1][i]-'0';
+    int i = -1, port = 0;
+    while (argv[1][++i] != '\0')
+        port = port * 10 + argv[1][i] - '0';
 
     struct sockaddr_in dest, server;
     socklen_t socketSize = sizeof(struct sockaddr_in);
@@ -86,7 +87,7 @@ int main(int argc, char* argv[])
     //Handle outside termination of program
     signal(SIGINT, rageHandler);
 
-    if (bind(s, (struct sockaddr*)&server, sizeof(struct sockaddr)) != 0)
+    if (bind(s, (struct sockaddr *)&server, sizeof(struct sockaddr)) != 0)
     {
         printf("Unable to open TCP socket on port: %d\n", port);
         printf("%s\n", strerror(errno));
@@ -99,26 +100,28 @@ int main(int argc, char* argv[])
     char host[NI_MAXHOST];
 
     if (debug > 0)
-        if (getifaddrs(&ifaddr) == -1) {
+        if (getifaddrs(&ifaddr) == -1)
+        {
             perror("getifaddrs");
             exit(EXIT_FAILURE);
         }
 
-
     //Prints out the servers IP, useful for debugging
     int n;
     if (debug > 1)
-        for (ifa = ifaddr, n = 0; ifa != NULL; ifa = ifa->ifa_next, n++) {
+        for (ifa = ifaddr, n = 0; ifa != NULL; ifa = ifa->ifa_next, n++)
+        {
             printf("loop\n");
             if (ifa->ifa_addr == NULL)
                 continue;
 
             int family = ifa->ifa_addr->sa_family;
-            if (family == AF_INET || family == AF_INET6) {
-                int sts = getnameinfo(ifa->ifa_addr, (family == AF_INET) ? sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6), host, NI_MAXHOST,NULL, 0, NI_NUMERICHOST);
+            if (family == AF_INET || family == AF_INET6)
+            {
+                int sts = getnameinfo(ifa->ifa_addr, (family == AF_INET) ? sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6), host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
                 if (sts != 0)
                     error(gai_strerror(sts));
-                printf("%s:\t%s\n",ifa->ifa_name, host);
+                printf("%s:\t%s\n", ifa->ifa_name, host);
             }
         }
 
@@ -129,88 +132,86 @@ int main(int argc, char* argv[])
     int rc;
 
     pthread_t ui_thread;
-    pthread_create(&ui_thread, NULL, UIThread, (void*) NULL);
+    pthread_create(&ui_thread, NULL, UIThread, (void *)NULL);
 
     long connectionSocket;
     struct timeval timeout;
 
-    while(1)
+    while (1)
     {
 
-      FD_ZERO(&set);
-      FD_SET(s, &set);
+        FD_ZERO(&set);
+        FD_SET(s, &set);
 
-      timeout.tv_sec = 0;
-      timeout.tv_usec = 2 * 1000000;
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 2 * 1000000;
 
-      // printf("Waiting on select()...\n");
-      rc = select(s + 1, &set, NULL, NULL, &timeout);
+        // printf("Waiting on select()...\n");
+        rc = select(s + 1, &set, NULL, NULL, &timeout);
 
-      if (rc < 0)
-      {
-         perror("\nselect() failed");
-         break;
-      }
+        if (rc < 0)
+        {
+            perror("\nselect() failed");
+            break;
+        }
 
-      if (rc == 0)
-      {
-         // printf("flag checked\n");
-         if(flag == 1)
-         {
-           printf("%s\n", "hard terminate");
-           break;
-         }
-         else if(flag == 2)
-         {
-           char buffer[256];
+        if (rc == 0)
+        {
+            // printf("flag checked\n");
+            if (flag == 1)
+            {
+                printf("%s\n", "hard terminate");
+                break;
+            }
+            else if (flag == 2)
+            {
+                char buffer[256];
 
-           fscanf(stdin, "%s", buffer);
-           printf("%s\n", "soft terminate");
-           pthread_mutex_lock(&mutex);
-           Node *start = list->list;
+                fscanf(stdin, "%s", buffer);
+                printf("%s\n", "soft terminate");
+                pthread_mutex_lock(&mutex);
+                Node *start = list->list;
 
-           while(start)
-           {
-             pthread_join(((Thread*)(start->data))->tid, NULL);
-             start = start->next;
-           }
+                while (start)
+                {
+                    pthread_join(((Thread *)(start->data))->tid, NULL);
+                    start = start->next;
+                }
 
-           pthread_mutex_unlock(&mutex);
-           break;
-         }
-         continue;
-      }
+                pthread_mutex_unlock(&mutex);
+                break;
+            }
+            continue;
+        }
 
-      if ((connectionSocket = accept(s, (struct sockaddr*)&dest, &socketSize)) > 0)
-      {
-        char *address = inet_ntoa(dest.sin_addr);
-          if (debug > 0)
-              printf("Recieved message from %s\n", address);
+        if ((connectionSocket = accept(s, (struct sockaddr *)&dest, &socketSize)) > 0)
+        {
+            char *address = inet_ntoa(dest.sin_addr);
+            if (debug > 0)
+                printf("Recieved message from %s\n", address);
 
+            Thread *thread = malloc(sizeof(Thread));
+            thread->percent = 0;
+            thread->ip = NULL;
+            thread->filename = NULL;
 
-          Thread *thread = malloc(sizeof(Thread));
-          thread->percent = 0;
-          thread->ip = NULL;
-          thread->filename = NULL;
+            thread->ip = malloc(sizeof(char) * (1 + strlen(address)));
+            strcpy(thread->ip, address);
 
-          thread->ip = malloc(sizeof(char) * (1 + strlen(address)));
-          strcpy(thread->ip, address);
+            ThreadInfo *threadInfo = malloc(sizeof(ThreadInfo));
+            threadInfo->connectionSocket = connectionSocket;
+            threadInfo->thread = thread;
 
-          ThreadInfo *threadInfo = malloc(sizeof(ThreadInfo));
-          threadInfo->connectionSocket = connectionSocket;
-          threadInfo->thread = thread;
+            if (pthread_create(&thread->tid, NULL, threadAccept, (void *)threadInfo))
+            {
+                close(s);
+                error("Error creating thread");
+            }
 
-          if (pthread_create(&thread->tid, NULL, threadAccept, (void*)threadInfo))
-      		{
-              close(s);
-              error("Error creating thread");
-      		}
-
-          pthread_mutex_lock(&mutex);
-          listAdd(list, (void*) thread);
-          pthread_mutex_unlock(&mutex);
-      }
-
+            pthread_mutex_lock(&mutex);
+            listAdd(list, (void *)thread);
+            pthread_mutex_unlock(&mutex);
+        }
     }
 
     list = listClear(list, destroy);
@@ -222,64 +223,62 @@ int main(int argc, char* argv[])
 
 void *UIThread(void *args)
 {
-  printf("%s\n", "Enter 'show' to see transfer progress or 'exit' to enter exit protocol");
-  char buffer[256];
+    printf("%s\n", "Enter 'show' to see transfer progress or 'exit' to enter exit protocol");
+    char buffer[256];
 
-  while(1)
-  {
-    // fgets(buffer, 256, stdin);
-    fscanf(stdin, "%s", buffer);
-
-    if(strcmp(buffer, "show") == 0)
+    while (1)
     {
-      //display active transfers
+        // fgets(buffer, 256, stdin);
+        fscanf(stdin, "%s", buffer);
 
-      pthread_mutex_lock(&mutex);
+        if (strcmp(buffer, "show") == 0)
+        {
+            //display active transfers
 
-      //view list
+            pthread_mutex_lock(&mutex);
 
-      Node *start = list->list;
+            //view list
 
-      while(start)
-      {
-        Thread *t = (Thread*)(start->data);
-        if(t->ip)
-          printf("%s : ", t->ip);
-        if(t->filename)
-          printf("%s : ", t->filename);
-        printf("%i%%\n", t->percent);
-        start = start->next;
-      }
+            Node *start = list->list;
 
-      pthread_mutex_unlock(&mutex);
+            while (start)
+            {
+                Thread *t = (Thread *)(start->data);
+                if (t->ip)
+                    printf("%s : ", t->ip);
+                if (t->filename)
+                    printf("%s : ", t->filename);
+                printf("%i%%\n", t->percent);
+                start = start->next;
+            }
+
+            pthread_mutex_unlock(&mutex);
+        }
+        else if (strcmp(buffer, "exit") == 0)
+        {
+            //terminate
+            printf("%s\n", "enter 's' - soft or 'h' - hard");
+
+            fscanf(stdin, "%s", buffer);
+
+            if (strcmp(buffer, "s") == 0)
+            {
+                flag = 1;
+            }
+            else if (strcmp(buffer, "h") == 0)
+            {
+                flag = 2;
+            }
+            return NULL;
+        }
     }
-    else if(strcmp(buffer, "exit") == 0)
-    {
-      //terminate
-      printf("%s\n", "enter 's' - soft or 'h' - hard");
-
-      fscanf(stdin, "%s", buffer);
-
-      if(strcmp(buffer, "s") == 0)
-      {
-        flag = 1;
-      }
-      else if(strcmp(buffer, "h") == 0)
-      {
-        flag = 2;
-      }
-      return NULL;
-    }
-
-  }
-
 }
 
-void* threadAccept(void* args)
+void *threadAccept(void *args)
 {
-  ThreadInfo *threadInfo = (ThreadInfo*)args;
+    ThreadInfo *threadInfo = (ThreadInfo *)args;
 
-    char buffer[MAXBUFFER+1];
+    char buffer[MAXBUFFER + 1];
     long connectionSocket = threadInfo->connectionSocket;
 
     FileInfo fInfo;
@@ -293,11 +292,11 @@ void* threadAccept(void* args)
             sprintf(fname, "%s%s-%d", "output/", fInfo.fileName, ++ending);
 
     pthread_mutex_lock(&mutex);
-    threadInfo->thread->filename = malloc(sizeof(char) * (1+strlen(fInfo.fileName)));
+    threadInfo->thread->filename = malloc(sizeof(char) * (1 + strlen(fInfo.fileName)));
     strcpy(threadInfo->thread->filename, fInfo.fileName);
     pthread_mutex_unlock(&mutex);
 
-    FILE* output;
+    FILE *output;
     if (outputFile)
     {
         output = fopen(fname, "w");
@@ -320,7 +319,7 @@ void* threadAccept(void* args)
         currentChunk++;
 
         pthread_mutex_lock(&mutex);
-        threadInfo->thread->percent = 100 * ( ( ((double)currentChunk) * ((double)fInfo.chunkSize) )/((unsigned long)fInfo.fileSize) );
+        threadInfo->thread->percent = 100 * ((((double)currentChunk) * ((double)fInfo.chunkSize)) / ((unsigned long)fInfo.fileSize));
         // threadInfo->thread->percent = fInfo.fileSize;
         pthread_mutex_unlock(&mutex);
 

@@ -133,8 +133,7 @@ void sendFile(char* file, int socket)
         }
         bytesSent += sent;
 
-        if (debug)
-            sleep(1);
+        sleep(1);
     }
 
     if (debug)
