@@ -29,9 +29,29 @@ List *list;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 // int max_sd;
 
+typedef struct thread
+{
+  pthread_t tid;
+  int percent;
+
+  char *filename;
+  char *ip;
+}Thread;
+
+typedef struct threadInfo{
+  long connectionSocket;
+  Thread *thread;
+}ThreadInfo;
+
 void destroy(void *data)
 {
+  Thread * t = (Thread*)data;
 
+  if(t->filename)
+    free(t->filename);
+  if(t->ip)
+    free(t->ip);
+  free(t);
 }
 
 void rageHandler(int signum)
@@ -39,19 +59,6 @@ void rageHandler(int signum)
   list = listClear(list, destroy);
     close(s);
 }
-
-typedef struct thread
-{
-  pthread_t tid;
-  int percent;
-
-  char *filename;
-}Thread;
-
-typedef struct threadInfo{
-  long connectionSocket;
-  Thread *thread;
-}ThreadInfo;
 
 int main(int argc, char* argv[])
 {
@@ -155,17 +162,11 @@ int main(int argc, char* argv[])
          }
          else if(flag == 2)
          {
+           char buffer[256];
+
+           fscanf(stdin, "%s", buffer);
            printf("%s\n", "soft terminate");
-           // wait for threads to finish
-
-           // while()
-           // {
-           //
-           // }
            pthread_mutex_lock(&mutex);
-
-           //view list
-
            Node *start = list->list;
 
            while(start)
@@ -175,19 +176,25 @@ int main(int argc, char* argv[])
            }
 
            pthread_mutex_unlock(&mutex);
+           break;
          }
          continue;
       }
 
       if ((connectionSocket = accept(s, (struct sockaddr*)&dest, &socketSize)) > 0)
       {
+        char *address = inet_ntoa(dest.sin_addr);
           if (debug > 0)
-              printf("Recieved message from %s\n", inet_ntoa(dest.sin_addr));
+              printf("Recieved message from %s\n", address);
 
 
           Thread *thread = malloc(sizeof(Thread));
           thread->percent = 0;
+          thread->ip = NULL;
           thread->filename = NULL;
+
+          thread->ip = malloc(sizeof(char) * (1 + strlen(address)));
+          strcpy(thread->ip, address);
 
           ThreadInfo *threadInfo = malloc(sizeof(ThreadInfo));
           threadInfo->connectionSocket = connectionSocket;
@@ -215,7 +222,7 @@ int main(int argc, char* argv[])
 
 void *UIThread(void *args)
 {
-
+  printf("%s\n", "Enter 'show' to see transfer progress or 'exit' to enter exit protocol");
   char buffer[256];
 
   while(1)
@@ -236,23 +243,31 @@ void *UIThread(void *args)
       while(start)
       {
         Thread *t = (Thread*)(start->data);
+        if(t->ip)
+          printf("%s : ", t->ip);
         if(t->filename)
-          printf("%s:", t->filename);
+          printf("%s : ", t->filename);
         printf("%i%%\n", t->percent);
         start = start->next;
       }
 
       pthread_mutex_unlock(&mutex);
     }
-    else if(strcmp(buffer, "hexit") == 0)
+    else if(strcmp(buffer, "exit") == 0)
     {
       //terminate
-      flag = 1;
-      return NULL;
-    }
-    else if(strcmp(buffer, "sexit") == 0)
-    {
-      flag = 2;
+      printf("%s\n", "enter 's' - soft or 'h' - hard");
+
+      fscanf(stdin, "%s", buffer);
+
+      if(strcmp(buffer, "s") == 0)
+      {
+        flag = 1;
+      }
+      else if(strcmp(buffer, "h") == 0)
+      {
+        flag = 2;
+      }
       return NULL;
     }
 
@@ -280,7 +295,6 @@ void* threadAccept(void* args)
     pthread_mutex_lock(&mutex);
     threadInfo->thread->filename = malloc(sizeof(char) * (1+strlen(fInfo.fileName)));
     strcpy(threadInfo->thread->filename, fInfo.fileName);
-    threadInfo->thread->filename[strlen(fInfo.fileName)] = '\0';
     pthread_mutex_unlock(&mutex);
 
     FILE* output;
@@ -318,4 +332,5 @@ void* threadAccept(void* args)
         fclose(output);
 
     close(connectionSocket);
+    return NULL;
 }

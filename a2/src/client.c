@@ -4,7 +4,7 @@
 
 #include "libs.h"
 
-#define debug 0
+#define debug 1
 
 void error(const char* msg);
 void sendFile(char* file, int socket);
