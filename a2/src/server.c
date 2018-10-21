@@ -4,6 +4,8 @@
 #include <ifaddrs.h>
 #include <signal.h>
 #include <pthread.h>
+#include <sys/sem.h>
+#include <semaphore.h>
 
 #include "list.h"
 #include "libs.h"
@@ -27,6 +29,8 @@ int s;
 int flag = 0;
 List *list;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+int flag_id;
+sem_t flag_wait;
 // int max_sd;
 
 typedef struct thread
@@ -54,6 +58,18 @@ void destroy(void *data)
   free(t);
 }
 
+int compare(void *a, void *b)
+{
+  Thread *t1 = (Thread*) a;
+  Thread *t2 = (Thread*) b;
+
+  if(pthread_equal(t1->tid, t2->tid))
+  {
+    return 0;
+  }
+  return 1;
+}
+
 void rageHandler(int signum)
 {
   list = listClear(list, destroy);
@@ -64,6 +80,9 @@ int main(int argc, char* argv[])
 {
     if (argc < 2)
         error("Port required");
+
+    if(semctl( flag_id, 1, SETVAL, flag_wait) == 1)
+         perror("Semaphore failed to initialize");
 
     //Port number
     int i=-1, port = 0;
@@ -141,7 +160,7 @@ int main(int argc, char* argv[])
       FD_SET(s, &set);
 
       timeout.tv_sec = 0;
-      timeout.tv_usec = 2 * 1000000;
+      timeout.tv_usec = 0.5 * 1000000;
 
       // printf("Waiting on select()...\n");
       rc = select(s + 1, &set, NULL, NULL, &timeout);
@@ -162,20 +181,50 @@ int main(int argc, char* argv[])
          }
          else if(flag == 2)
          {
-           char buffer[256];
-
-           fscanf(stdin, "%s", buffer);
-           printf("%s\n", "soft terminate");
-           pthread_mutex_lock(&mutex);
-           Node *start = list->list;
-
-           while(start)
+           int list_size = listSize(list);
+           if(list_size)
            {
-             pthread_join(((Thread*)(start->data))->tid, NULL);
-             start = start->next;
-           }
+             char buffer[256];
+             int terminate = 0;
+             while(1)
+             {
+               printf("%s\n", "Connections are still in progress, 't' - terminate, 'r' - run");
+               fscanf(stdin, "%s", buffer);
 
-           pthread_mutex_unlock(&mutex);
+               if(strcmp(buffer, "t") == 0)
+               {
+                 printf("Connections Terminated");
+                 terminate = 1;
+                 break;
+               }
+               else if(strcmp(buffer, "r") == 0)
+               {
+                 printf("%s\n", "Finishing Connections");
+                 sem_post(&flag_wait);
+                 pthread_mutex_lock(&mutex);
+                 list_size = listSize(list);
+                 pthread_t threads[list_size];
+
+                 Node *start = list->list;
+
+                 for(int i = 0; start; i ++)
+                 {
+                   Thread *t = (Thread*) start->data;
+                   threads[i] = t->tid;
+                   start = start->next;
+                 }
+
+                 pthread_mutex_unlock(&mutex);
+
+                 for(int i = 0; i < list_size; i ++)
+                 {
+                   pthread_join(threads[i], NULL);
+                 }
+                 break;
+               }
+             }
+           }
+           pthread_cancel(ui_thread);
            break;
          }
          continue;
@@ -260,15 +309,16 @@ void *UIThread(void *args)
 
       fscanf(stdin, "%s", buffer);
 
-      if(strcmp(buffer, "s") == 0)
+      if(strcmp(buffer, "h") == 0)
       {
         flag = 1;
+        return NULL;
       }
-      else if(strcmp(buffer, "h") == 0)
+      else if(strcmp(buffer, "s") == 0)
       {
         flag = 2;
+        sem_wait(&flag_wait);
       }
-      return NULL;
     }
 
   }
@@ -309,9 +359,16 @@ void* threadAccept(void* args)
     }
 
     int currentChunk = 0;
+    int percent = 0;
+    int mark = 10;
 
     while ((len = recv(connectionSocket, buffer, MAXBUFFER, 0)) > 0)
     {
+      if(percent >= mark)
+      {
+        sleep(1);
+        mark += 10;
+      }
         if (len < 0)
         {
             close(s);
@@ -320,7 +377,7 @@ void* threadAccept(void* args)
         currentChunk++;
 
         pthread_mutex_lock(&mutex);
-        threadInfo->thread->percent = 100 * ( ( ((double)currentChunk) * ((double)fInfo.chunkSize) )/((unsigned long)fInfo.fileSize) );
+        threadInfo->thread->percent = percent = 100 * ( ( ((double)currentChunk) * ((double)fInfo.chunkSize) )/((unsigned long)fInfo.fileSize) );
         // threadInfo->thread->percent = fInfo.fileSize;
         pthread_mutex_unlock(&mutex);
 
@@ -332,5 +389,8 @@ void* threadAccept(void* args)
         fclose(output);
 
     close(connectionSocket);
+    pthread_mutex_lock(&mutex);
+    listRemove(list, indexOf(list, compare, threadInfo->thread));
+    pthread_mutex_unlock(&mutex);
     return NULL;
 }
