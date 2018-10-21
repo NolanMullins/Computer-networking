@@ -13,7 +13,7 @@ clean:
 	rm client server src/*.o
 
 cleanOutput:
-	rm output/* -r
+	rm output/!(out)
 
 run: 
 	./client localhost:8080 data/lessSmallTest.txt 128
