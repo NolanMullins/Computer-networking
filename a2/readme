@@ -6,8 +6,22 @@
 How to use:
 
 1) ./server <port>
-2) ./client <ip:port> <file> <msg size>
+2) ./client <ip:port> <file> <transfer size>
 
 Script:
 
 ./run.sh <ip:port> <file> <# of times to run> <transfer size (optional)>
+
+~~~~ info ~~~~
+
+File collisions: When file collisions occur a -# will be appended, this is generally how file
+collisions are handled during downloads in other software
+
+Sever cmds:
+    "show" will list all active downloads
+    "exit" will close the server, after typing exit you can enter "s" or "h" for a soft or hard shutdown
+
+Sleeping: We have it sleeping after every send currently since its nice to watch it increment
+single digits but if the define is changed to 0 in the client and 1 on the server it will sleep
+every 10%
+
