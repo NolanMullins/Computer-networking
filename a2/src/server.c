@@ -390,7 +390,7 @@ void* threadAccept(void* args)
 
     close(connectionSocket);
     pthread_mutex_lock(&mutex);
-    listRemove(list, indexOf(list, compare, threadInfo->thread));
+    destroy(listRemove(list, indexOf(list, compare, threadInfo->thread)));
     pthread_mutex_unlock(&mutex);
     return NULL;
 }
