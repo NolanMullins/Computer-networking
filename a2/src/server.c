@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -396,4 +394,3 @@ void* threadAccept(void* args)
     pthread_mutex_unlock(&mutex);
     return NULL;
 }
->>>>>>> 9cfb1d5663ea4ab5087e3c0b4c4e23174c61c9fb
