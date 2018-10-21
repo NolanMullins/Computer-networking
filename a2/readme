@@ -1,8 +1,7 @@
-/***********************/
- * cis3210 A1          *
- * Name: Nolan Mullins *
- * Student #: 0939720  *
-/***********************/
+/***************************************/
+ * cis3210 A2                          *
+ * Name: Nolan Mullins, Ryan Symington *
+/***************************************/
 
 How to use:
 
@@ -11,85 +10,4 @@ How to use:
 
 Script:
 
-./run.sh <ip:port> <file> <# of times to run>
-
-/*****************************************/
- Client at home -> linux.socs.uoguelph.ca
-/*****************************************/
-
-Ping avg: 13ms
-Ping min: 7ms
-Ping max: 23ms
-
-  1     1 ms     1 ms     1 ms  hitronhub.home [192.168.0.1]
-  2    56 ms    11 ms    10 ms  99.225.176.1
-  3     9 ms    13 ms    13 ms  69.63.243.153
-  4    11 ms    11 ms    10 ms  9012-cgw01.wlfdle.rmgt.net.rogers.com [64.71.240.1]
-  5    12 ms    14 ms    13 ms  209.148.230.46
-  6    16 ms    13 ms    14 ms  24.156.146.190
-  7    11 ms    15 ms    14 ms  24.156.146.217
-  8     *        *        *     Request timed out.
-  9     *        *        *     Request timed out.
- 10     *        *        *     Request timed out.
- 11     *        *        *     Request timed out.
- 12     *        *        *     Request timed out.
- 13     *        *        *     Request timed out.
- 14     *        *        *     Request timed out.
- 15     *        *        *     Request timed out.
- 16     *        *        *     Request timed out.
- 17     *        *        *     Request timed out.
- 18     *        *        *     Request timed out.
- 19     *        *        *     Request timed out.
- 20     *        *        *     Request timed out.
- 21     *        *        *     Request timed out.
- 22     *        *        *     Request timed out.
- 23    16 ms    16 ms    12 ms  spider.cis.uoguelph.ca [131.104.48.74]
-
-transfer avg: 0.0313s
-transfer min: 0.0187s
-transfer max: 0.0399s
-
-Rate avg: 5.432 MB/s
-Rate max: 9.059 MB/s
-Rate min: 4.255 MB/s
-
-/**************************************************/
- Client at school (wifi) -> linux.socs.uoguelph.ca
-/**************************************************/
-
-Ping avg: 20.105ms
-Ping min: 1.697ms
-Ping max: 132.911ms
-
-  1     1 ms     1 ms     2 ms  10.11.16.1
-  2     2 ms     2 ms     2 ms  da-cj.net.uoguelph.ca [131.104.134.5]
-  3     5 ms     1 ms     1 ms  spider.cis.uoguelph.ca [131.104.48.74]
-
-transfer avg: 0.0176s
-transfer min: 0.0095s
-transfer max: 0.0272s
-
-Rate avg: 9.669 MB/s
-Rate max: 17.847 MB/s 
-Rate min: 6.235 MB/s
-
-/***************************************************/
- Client at school (wired) -> linux.socs.uoguelph.ca
-/***************************************************/
-
-Ping avg: 6.522ms
-Ping min: 1.841ms
-Ping max: 20.063ms
-
-  1     1 ms     1 ms     1 ms  10.2.146.1
-  2     2 ms     1 ms     2 ms  ca-dj.net.uoguelph.ca [131.104.133.6]
-  3     3 ms     1 ms     1 ms  da-ca.net.uoguelph.ca [131.104.134.1]
-  4     1 ms     1 ms     1 ms  percy.socs.uoguelph.ca [131.104.48.74]
-
-transfer avg: 0.0101s
-transfer min: 0.0086s
-transfer max: 0.01285s
-
-Rate avg: 16.806 MB/s
-Rate max: 19.723 MB/s
-Rate min: 13.218 MB/s
+./run.sh <ip:port> <file> <# of times to run> <transfer size (optional)>
