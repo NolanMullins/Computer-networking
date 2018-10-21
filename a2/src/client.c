@@ -5,6 +5,7 @@
 #include "libs.h"
 
 #define debug 0
+#define clientSideSleep 1
 
 void error(const char* msg);
 void sendFile(char* file, int socket);
@@ -133,8 +134,8 @@ void sendFile(char* file, int socket)
         }
         bytesSent += sent;
 
-        if(debug)
-          sleep(1);
+        if(clientSideSleep)
+            sleep(1);
     }
 
     if (debug)
