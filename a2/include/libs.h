@@ -16,7 +16,7 @@
 typedef struct
 {
     unsigned long fileSize;
-    int chunkSize;
+    unsigned long chunkSize;
     char fileName[64];
 } FileInfo;
 

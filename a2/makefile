@@ -19,10 +19,10 @@ run:
 	./client localhost:8080 data/lessSmallTest.txt 128
 
 runBig:
-	./client localhost:8080 data/wonderlandBig.txt 128
+	./client localhost:8080 data/wonderland.txt 128
 
 run20x:
-	./run.sh localhost:8080 data/wonderlandBig.txt 20
+	./run.sh localhost:8080 data/wonderland.txt 20
 
 runSever20x:
 	./run.sh 131.104.48.74:12059 data/wonderland.txt 20

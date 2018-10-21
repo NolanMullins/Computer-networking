@@ -10,7 +10,7 @@
 void error(const char* msg);
 void sendFile(char* file, int socket);
 
-int bufMAX = MAXBUFFER;
+unsigned long bufMAX = MAXBUFFER;
 
 int main(int argc, char* argv[])
 {

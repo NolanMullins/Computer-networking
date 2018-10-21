@@ -376,7 +376,7 @@ void *threadAccept(void *args)
 		currentChunk++;
 
 		pthread_mutex_lock(&mutex);
-		threadInfo->thread->percent = percent = 100 * ((((double)currentChunk) * ((double)fInfo.chunkSize)) / ((unsigned long)fInfo.fileSize));
+		threadInfo->thread->percent = percent = 100 * ((((double)currentChunk) * ((unsigned long)fInfo.chunkSize)) / ((unsigned long)fInfo.fileSize));
 		// threadInfo->thread->percent = fInfo.fileSize;
 		pthread_mutex_unlock(&mutex);
 
